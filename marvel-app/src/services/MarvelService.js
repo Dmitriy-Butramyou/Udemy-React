@@ -12,12 +12,24 @@ _apiKey = 'apikey=a8e9ae933ac19f4a0a370991bafe6762';
         return await res.json();
     }
 
-    getAllCharecters = () => {
-        return this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`);
+    getAllCharacters = async () => {
+        const res = await this.getResource(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`);
+        return res.data.results.map(this._transformCharacter);
     }
 
-    getCharecter = (id) => {
-        return this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
+    getCharacter = async (id) => {
+        const res = await this.getResource(`${this._apiBase}characters/${id}?${this._apiKey}`);
+        return this._transformCharacter(res.data.results[0]);
+    }
+
+    _transformCharacter = (char) => {
+        return {
+            name: char.name,
+            description: char.description ? `${char.description.slice(0, 210)}...` : 'There is no description for this character',
+            thumbnail: char.thumbnail.path + '.' + char.thumbnail.extension,
+            homepage: char.urls[0].url,
+            wiki: char.urls[1].url
+        }
     }
 }
 
